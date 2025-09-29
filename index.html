@@ -256,9 +256,10 @@
     <div class="container">
         <div class="card">
             <div class="theme-selector">
-                <button class="theme-btn active" data-theme="light">Light</button>
+                <button class="theme-btn active" data-theme="system">System</button>
+                <button class="theme-btn" data-theme="light">Light</button>
                 <button class="theme-btn" data-theme="dark">Dark</button>
-                <button class="theme-btn" data-theme="system">System</button>
+                
             </div>
 
             <div class="input-section">
@@ -280,14 +281,6 @@
                         <input type="number" id="hours-input" placeholder="Hours" min="0" max="23">
                         <input type="number" id="minutes-input" placeholder="Minutes" min="0" max="59">
                     </div>
-                </div>
-
-                <div class="input-group">
-                    <label for="timezone-select">Timezone</label>
-                    <select id="timezone-select">
-                        <option value="local">Local Time</option>
-                        <option value="utc">UTC</option>
-                    </select>
                 </div>
             </div>
         </div>
@@ -429,12 +422,10 @@
             }
             
             // Apply timezone if needed
-            const timezone = document.getElementById('timezone-select').value;
-            if (timezone === 'utc') {
-                // Convert local timestamp to UTC
-                const date = new Date(timestamp * 1000);
-                timestamp = Math.floor(date.getTime() / 1000) - (date.getTimezoneOffset() * 60);
-            }
+            // const timezone = document.getElementById('timezone-select').value;
+            // Convert local timestamp to UTC
+            // const date = new Date(timestamp * 1000);
+            // timestamp = Math.floor(date.getTime() / 1000) - (date.getTimezoneOffset() * 60);
             
             // Generate all timestamp formats
             const formats = [
