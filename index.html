@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Time Generator</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --card-bg: #f5f5f5;
+            --input-bg: #ffffff;
+            --border-color: #dddddd;
+            --accent-color: #5865f2;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1e1f22;
+            --text-color: #dbdee1;
+            --card-bg: #2b2d31;
+            --input-bg: #1e1f22;
+            --border-color: #404249;
+            --accent-color: #5865f2;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: var(--accent-color);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .theme-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .theme-btn {
+            padding: 8px 16px;
+            border: 1px solid var(--border-color);
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .theme-btn.active {
+            background-color: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        input, select {
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            font-size: 1rem;
+        }
+
+        .datetime-inputs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .datetime-inputs input {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .relative-inputs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .relative-inputs input {
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .input-type-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .input-type-btn {
+            padding: 8px 16px;
+            border: 1px solid var(--border-color);
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border-radius: 6px;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .input-type-btn.active {
+            background-color: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .output-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .timestamp-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            border-radius: 6px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+
+        .timestamp-name {
+            font-weight: 600;
+            min-width: 120px;
+        }
+
+        .timestamp-preview {
+            flex: 1;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .copy-btn {
+            padding: 6px 12px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        .copy-btn:hover {
+            opacity: 0.9;
+        }
+
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .datetime-inputs, .relative-inputs {
+                flex-direction: column;
+            }
+            
+            .datetime-inputs input, .relative-inputs input {
+                width: 100%;
+            }
+            
+            .timestamp-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .timestamp-name {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Discord Time Generator</h1>
+        <p class="subtitle">Generate Discord timestamps for any date and time</p>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <div class="theme-selector">
+                <button class="theme-btn active" data-theme="light">Light</button>
+                <button class="theme-btn" data-theme="dark">Dark</button>
+                <button class="theme-btn" data-theme="system">System</button>
+            </div>
+
+            <div class="input-section">
+                <div class="input-type-selector">
+                    <button class="input-type-btn active" data-type="datetime">Date & Time</button>
+                    <button class="input-type-btn" data-type="relative">Relative Time</button>
+                </div>
+
+                <div id="datetime-input" class="input-group">
+                    <div class="datetime-inputs">
+                        <input type="date" id="date-input" value="">
+                        <input type="time" id="time-input" value="12:00">
+                    </div>
+                </div>
+
+                <div id="relative-input" class="input-group hidden">
+                    <div class="relative-inputs">
+                        <input type="number" id="days-input" placeholder="Days" min="0">
+                        <input type="number" id="hours-input" placeholder="Hours" min="0" max="23">
+                        <input type="number" id="minutes-input" placeholder="Minutes" min="0" max="59">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="timezone-select">Timezone</label>
+                    <select id="timezone-select">
+                        <option value="local">Local Time</option>
+                        <option value="utc">UTC</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="card output-section">
+            <h2>Discord Timestamps</h2>
+            <div id="timestamp-output">
+                <!-- Timestamps will be generated here -->
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Generated timestamps will appear here. Click on any timestamp to copy it to clipboard.</p>
+    </div>
+
+    <script>
+        // System theme detection
+        function detectSystemTheme() {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                return 'dark';
+            }
+            return 'light';
+        }
+
+        // Theme switching
+        document.querySelectorAll('.theme-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                const theme = btn.getAttribute('data-theme');
+                
+                if (theme === 'system') {
+                    document.documentElement.removeAttribute('data-theme');
+                    // Apply system theme
+                    const systemTheme = detectSystemTheme();
+                    if (systemTheme === 'dark') {
+                        document.documentElement.setAttribute('data-theme', 'dark');
+                    } else {
+                        document.documentElement.removeAttribute('data-theme');
+                    }
+                } else {
+                    document.documentElement.setAttribute('data-theme', theme);
+                }
+                
+                // Save preference
+                localStorage.setItem('theme', theme);
+            });
+        });
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        const themeBtn = document.querySelector(`.theme-btn[data-theme="${savedTheme}"]`);
+        if (themeBtn) {
+            themeBtn.click();
+        } else {
+            // If saved theme is system, apply system theme
+            if (savedTheme === 'system') {
+                document.querySelector('.theme-btn[data-theme="system"]').click();
+            }
+        }
+
+        // Listen for system theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            const currentTheme = document.querySelector('.theme-btn.active').getAttribute('data-theme');
+            if (currentTheme === 'system') {
+                if (e.matches) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                } else {
+                    document.documentElement.removeAttribute('data-theme');
+                }
+            }
+        });
+
+        // Input type switching
+        document.querySelectorAll('.input-type-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.input-type-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                const type = btn.getAttribute('data-type');
+                document.getElementById('datetime-input').classList.toggle('hidden', type !== 'datetime');
+                document.getElementById('relative-input').classList.toggle('hidden', type !== 'relative');
+                
+                generateTimestamps();
+            });
+        });
+
+        // Set default date to today
+        const today = new Date();
+        const dateString = today.toISOString().split('T')[0];
+        document.getElementById('date-input').value = dateString;
+
+        // Generate timestamps on input change
+        document.querySelectorAll('input, select').forEach(element => {
+            element.addEventListener('input', generateTimestamps);
+            element.addEventListener('change', generateTimestamps);
+        });
+
+        // Initial generation
+        generateTimestamps();
+
+        function generateTimestamps() {
+            const outputElement = document.getElementById('timestamp-output');
+            outputElement.innerHTML = '';
+            
+            let timestamp;
+            const inputType = document.querySelector('.input-type-btn.active').getAttribute('data-type');
+            
+            if (inputType === 'datetime') {
+                const dateValue = document.getElementById('date-input').value;
+                const timeValue = document.getElementById('time-input').value;
+                
+                if (!dateValue || !timeValue) {
+                    outputElement.innerHTML = '<p>Please enter a valid date and time.</p>';
+                    return;
+                }
+                
+                const dateTime = new Date(`${dateValue}T${timeValue}`);
+                timestamp = Math.floor(dateTime.getTime() / 1000);
+            } else {
+                const days = parseInt(document.getElementById('days-input').value) || 0;
+                const hours = parseInt(document.getElementById('hours-input').value) || 0;
+                const minutes = parseInt(document.getElementById('minutes-input').value) || 0;
+                
+                if (days === 0 && hours === 0 && minutes === 0) {
+                    outputElement.innerHTML = '<p>Please enter a valid relative time.</p>';
+                    return;
+                }
+                
+                const now = new Date();
+                const futureTime = new Date(now.getTime() + 
+                    (days * 24 * 60 * 60 * 1000) + 
+                    (hours * 60 * 60 * 1000) + 
+                    (minutes * 60 * 1000));
+                
+                timestamp = Math.floor(futureTime.getTime() / 1000);
+            }
+            
+            // Apply timezone if needed
+            const timezone = document.getElementById('timezone-select').value;
+            if (timezone === 'utc') {
+                // Convert local timestamp to UTC
+                const date = new Date(timestamp * 1000);
+                timestamp = Math.floor(date.getTime() / 1000) - (date.getTimezoneOffset() * 60);
+            }
+            
+            // Generate all timestamp formats
+            const formats = [
+                { code: 'f', name: 'Short Date/Time' },
+                { code: 'F', name: 'Long Date/Time' },
+                { code: 'd', name: 'Short Date' },
+                { code: 'D', name: 'Long Date' },
+                { code: 't', name: 'Short Time' },
+                { code: 'T', name: 'Long Time' },
+                { code: 'R', name: 'Relative Time' }
+            ];
+            
+            formats.forEach(format => {
+                const timestampCode = `<t:${timestamp}:${format.code}>`;
+                const previewText = getPreviewText(timestamp, format.code);
+                
+                const item = document.createElement('div');
+                item.className = 'timestamp-item';
+                
+                item.innerHTML = `
+                    <div class="timestamp-name">${format.name}</div>
+                    <div class="timestamp-preview">${previewText}</div>
+                    <button class="copy-btn" data-code="${timestampCode}">Copy</button>
+                `;
+                
+                // Add copy functionality
+                const copyBtn = item.querySelector('.copy-btn');
+                copyBtn.addEventListener('click', () => {
+                    copyToClipboard(timestampCode);
+                    copyBtn.textContent = 'Copied!';
+                    setTimeout(() => {
+                        copyBtn.textContent = 'Copy';
+                    }, 2000);
+                });
+                
+                outputElement.appendChild(item);
+            });
+        }
+
+        function getPreviewText(timestamp, format) {
+            // This is a simplified preview - Discord will render it differently
+            const date = new Date(timestamp * 1000);
+            
+            switch(format) {
+                case 'f':
+                    return date.toLocaleString([], { dateStyle: 'short', timeStyle: 'short' });
+                case 'F':
+                    return date.toLocaleString([], { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' });
+                case 'd':
+                    return date.toLocaleDateString([], { year: 'numeric', month: '2-digit', day: '2-digit' });
+                case 'D':
+                    return date.toLocaleDateString([], { year: 'numeric', month: 'long', day: 'numeric' });
+                case 't':
+                    return date.toLocaleTimeString([], { hour: 'numeric', minute: 'numeric' });
+                case 'T':
+                    return date.toLocaleTimeString([], { hour: 'numeric', minute: 'numeric', second: 'numeric' });
+                case 'R':
+                    const now = new Date();
+                    const diff = (timestamp * 1000) - now.getTime();
+                    const absDiff = Math.abs(diff);
+                    
+                    if (absDiff < 60000) return 'now';
+                    if (absDiff < 3600000) return `${Math.round(absDiff/60000)} minutes ${diff > 0 ? 'from now' : 'ago'}`;
+                    if (absDiff < 86400000) return `${Math.round(absDiff/3600000)} hours ${diff > 0 ? 'from now' : 'ago'}`;
+                    return `${Math.round(absDiff/86400000)} days ${diff > 0 ? 'from now' : 'ago'}`;
+                default:
+                    return date.toLocaleString();
+            }
+        }
+
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+    </script>
+</body>
+</html>
